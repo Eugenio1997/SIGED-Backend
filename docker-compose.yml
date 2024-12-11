@@ -1,0 +1,43 @@
+
+services:
+  mysql-db-server: 
+    container_name: mysql_container
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: siged#123
+      MYSQL_DATABASE: env('DB_DATABASE')
+      MYSQL_USER: env('DB_USERNAME')
+      MYSQL_PASSWORD: env('DB_PASSWORD')
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+      - ./init_scripts:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
+    networks:
+      - siged-network
+
+
+  phpmyadmin:
+    container_name: phpmyadmin_container
+    image: phpmyadmin
+    restart: always
+    depends_on:
+      - mysql-db-server
+    environment:
+      PMA_HOST: mysql-db-server
+      MYSQL_ROOT_PASSWORD: siged#123
+    volumes:
+      - ./phpmyadmin_data:/var/lib/phpmyadmin
+    networks:
+      - siged-network
+    ports:
+      - "8080:80"
+
+networks:
+  siged-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  phpmyadmin_data:
